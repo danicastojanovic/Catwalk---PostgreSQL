@@ -10,7 +10,6 @@ questionsRouter.use(express.json());
 
 // Get all questions for specific product --completed (without page, count)
 // doesn't include reported questions
-// response: status 200
 questionsRouter.get('/', (req, res) => {
   debugger;
   db
