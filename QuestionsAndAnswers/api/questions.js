@@ -8,89 +8,63 @@ questionsRouter.use(express.json());
 
 // NEED TO DO: get questions
 
-// Get all questions for specific product
+// Get all questions for specific product --completed (without page, count)
 // doesn't include reported questions
-// Pagination?
-// GET /qa/questions
-// parameters: product_id, page=1, count=5
 // response: status 200
-// {
-//   "product_id": "17067",
-//   "results": [
-//       {
-//           "question_id": 104598,
-//           "question_body": "Does this product run big or small?",
-//           "question_date": "2019-01-17T00:00:00.000Z",
-//           "asker_name": "jbilas",
-//           "question_helpfulness": 8,
-//           "reported": false,
-//           "answers": {
-//               "1443570": {
-//                   "id": 1443570,
-//                   "body": "HideThisYouFool",
-//                   "date": "2021-03-07T00:00:00.000Z",
-//                   "answerer_name": "brotherBear",
-//                   "helpfulness": 0,
-//                   "photos": []
-//               },
-//               "1443575": {
-//                   "id": 1443575,
-//                   "body": "GarethNeedsHelp",
-//                   "date": "2021-03-07T00:00:00.000Z",
-//                   "answerer_name": "gareth",
-//                   "helpfulness": 0,
-//                   "photos": []
-//               }
-//           }
-//       },
-//     }
-//   }
 questionsRouter.get('/', (req, res) => {
+  debugger;
   db
-    .query(`SELECT qna.questions.question_id, question_body, question_date, asker_name, question_helpfulness, question_reported, qna.answers.answer_id, answer_body, answer_date, answerer_name, answer_helpfulness, photo_url FROM qna.questions LEFT JOIN qna.answers ON qna.questions.question_id=qna.answers.question_id LEFT JOIN qna.photos ON qna.answers.answer_id=qna.photos.answer_id WHERE product_id=$1 AND question_reported='f' AND answer_reported='f'`, [req.params.product_id], (err, data) => {
+    .query(`SELECT qna.questions.question_id, question_body, question_date, asker_name, question_helpfulness, question_reported, qna.answers.answer_id, answer_body, answer_date, answerer_name, answer_helpfulness, photo_url FROM qna.questions LEFT JOIN qna.answers ON qna.questions.question_id=qna.answers.question_id LEFT JOIN qna.photos ON qna.answers.answer_id=qna.photos.answer_id WHERE product_id=$1 AND question_reported='f' AND answer_reported='f'`, [req.query.product_id], (err, data) => {
       if (err) {
         console.error(err);
       }
-      // console.log(data.rows);
-      // let answer = {
-      //   "product_id": req.params.product_id.toString(),
-      //   "results": []
-      // };
-      // let temp1 = {};
-      // let temp2 = {};
-      // for (let i = 0; i < data.rows.length; i++) {
-      //   if ( Object.keys(temp1).includes( data.rows[i].question_id.toString() ) ) {
-      //     if ( Object.keys(temp2).includes( data.rows[i].answer_id.toString() ) ) {
-      //       temp2[data.rows[i].answer_id].photos.push(data.rows[i].photo_url);
-      //     } else {
-      //       temp2[data.rows[i].answer_id] = {
-      //         "id": data.rows[i].answer_id,
-      //         "body": data.rows[i].answer_body,
-      //         "date": data.rows[i].answer_date,
-      //         "answerer_name": data.rows[i].answerer_name,
-      //         "helpfulness": data.rows[i].answer_helpfulness,
-      //         "photos": data.rows[i].photo_url ? [data.rows[i].photo_url] : [],
-      //       }
-      //     }
-      //   } else {
-      //     temp1[data.rows[i].question_id] = {
-      //       "question_id": data.rows[i].question_id,
-      //       "question_body": data.rows[i].question_body,
-      //       "question_date": data.rows[i].question_date,
-      //       "asker_name": data.rows[i].asker_name,
-      //       "question_helpfulness": data.rows[i].question_helpfulness,
-      //       "reported": false,
-      //       "answers": {},
-      //     }
-      //   }
-      // }
-      // Object.keys(temp1).sort(function(a, b) {
-      //   return a - b;
-      // }).forEach(q => {
-      //   answer.results.push(temp1[q]);
-      // })
-      console.log(data.rows);
-      res.status(200).end();
+      let answer = {
+        "product_id": req.query.product_id.toString(),
+        "results": [],
+      };
+      let temp1 = {};
+      for (let i = 0; i < data.rows.length; i++) {
+        if ( temp1 && Object.keys(temp1).includes( data.rows[i].question_id.toString() ) ) {
+          if ( temp1[data.rows[i].question_id].answers && Object.keys(temp1[data.rows[i].question_id].answers).includes( data.rows[i].answer_id.toString() ) ) {
+            temp1[data.rows[i].question_id].answers[data.rows[i].answer_id].photos.push(data.rows[i].photo_url);
+          } else {
+            temp1[data.rows[i].question_id].answers[data.rows[i].answer_id] = {
+              "id": data.rows[i].answer_id,
+              "body": data.rows[i].answer_body,
+              "date": data.rows[i].answer_date,
+              "answerer_name": data.rows[i].answerer_name,
+              "helpfulness": data.rows[i].answer_helpfulness,
+              "photos": data.rows[i].photo_url ? [data.rows[i].photo_url] : [],
+            }
+          }
+        } else {
+          temp1[data.rows[i].question_id] = {
+            "question_id": data.rows[i].question_id,
+            "question_body": data.rows[i].question_body,
+            "question_date": data.rows[i].question_date,
+            "asker_name": data.rows[i].asker_name,
+            "question_helpfulness": data.rows[i].question_helpfulness,
+            "reported": false,
+            "answers": {},
+          }
+          if (data.rows[i].answer_id) {
+            temp1[data.rows[i].question_id].answers[data.rows[i].answer_id] = {
+                id: data.rows[i].answer_id,
+                body: data.rows[i].answer_body,
+                data: data.rows[i].answer_date,
+                answerer_name: data.rows[i].answerer_date,
+                helpfulness: data.rows[i].answer_helpfulness,
+                photos: data.rows[i].photo_url ? [data.rows[i].photo_url] : [],
+            }
+          }
+        }
+      }
+      Object.keys(temp1).sort(function(a, b) {
+        return a - b;
+      }).forEach(q => {
+        answer.results.push(temp1[q]);
+      })
+      res.status(200).json(answer);
     })
 })
 
