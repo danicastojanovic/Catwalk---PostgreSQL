@@ -6,7 +6,6 @@ const express = require('express');
 const questionsRouter = Router();
 questionsRouter.use(express.json());
 
-// NEED TO DO: get questions
 
 // Get all questions for specific product --completed (without page, count)
 // doesn't include reported questions
