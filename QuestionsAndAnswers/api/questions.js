@@ -11,7 +11,6 @@ questionsRouter.use(express.json());
 // Get all questions for specific product --completed (without page, count)
 // doesn't include reported questions
 questionsRouter.get('/', (req, res) => {
-  debugger;
   db
     .query(`SELECT qna.questions.question_id, question_body, question_date, asker_name, question_helpfulness, question_reported, qna.answers.answer_id, answer_body, answer_date, answerer_name, answer_helpfulness, photo_url FROM qna.questions LEFT JOIN qna.answers ON qna.questions.question_id=qna.answers.question_id LEFT JOIN qna.photos ON qna.answers.answer_id=qna.photos.answer_id WHERE product_id=$1 AND question_reported='f' AND answer_reported='f'`, [req.query.product_id], (err, data) => {
       if (err) {
