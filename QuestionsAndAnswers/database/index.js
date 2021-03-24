@@ -2,7 +2,7 @@ const {Client, Pool} = require('pg');
 
 // need to setup global variables in a file and gitignore
 const pool = new Pool({
-  host: 'localhost',
+  // host: 'localhost',
   port: 5432,
   database: 'questionsandanswers',
 });

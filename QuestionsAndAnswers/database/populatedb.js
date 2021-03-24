@@ -7,15 +7,17 @@ const pool = new Pool({
   host: 'localhost',
   port: 5432,
   database: 'postgres',
+  user: 'danica',
 });
 
 var newPool;
 
 pool
-  .query('CREATE DATABASE questionsandanswers')
+  .query('CREATE DATABASE questionsandanswers WITH OWNER danica')
   .then(() => {
     newPool = new Pool({
-      database: 'questionsandanswers'
+      database: 'questionsandanswers',
+      user: 'danica',
     })
     return newPool.query(sql)
   })
