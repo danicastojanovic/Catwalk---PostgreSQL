@@ -6,6 +6,7 @@ const pool = new Pool({
   port: 5432,
   database: 'questionsandanswers',
   user: 'danica',
+  password: '',
 });
 
 module.exports = {
