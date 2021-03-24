@@ -27,3 +27,7 @@ CREATE TABLE qna.photos (
   answer_id int references qna.answers(answer_id),
   photo_url varchar(500)
 );
+
+CREATE INDEX product ON qna.questions(product_id);
+CREATE INDEX question ON qna.answers(question_id);
+CREATE INDEX answer ON qna.photos(answer_id);

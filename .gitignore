@@ -1,2 +1,4 @@
 *.csv
+*.tar
+*.pem
 node_modules/
