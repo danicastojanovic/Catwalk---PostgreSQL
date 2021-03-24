@@ -10,7 +10,7 @@ answersRouter.put('/:answer_id/helpful', (req, res) => {
   db
     .query(`UPDATE qna.answers SET answer_helpfulness = answer_helpfulness + 1 WHERE answer_id=$1`, [req.params.answer_id], (err, data) => {
       if (err) {
-        console.error(err);
+        res.status(500).send(err);
       }
     })
     res.status(204).end();
@@ -21,7 +21,7 @@ answersRouter.put('/:answer_id/report', (req, data) => {
   db
     .query(`UPDATE qna.answers SET answer_reported = 't' WHERE answer_id=$1`, [req.params.answer_id], (err, res) => {
       if (err) {
-        console.error(err);
+        res.status(500).send(err);
       }
     })
     res.status(204).end();
